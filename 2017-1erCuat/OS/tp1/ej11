@@ -1,0 +1,19 @@
+#! /bin/bash
+# shscript
+# si recibe un - como primer argumento
+# hace un grep a todos los archivos con el segundo argumento y lo guarda en un archivo
+# y si falla imprime el nombre del archivo en el que fallo
+# en caso de no tener un menos como primer archivo, hace un grep del primer argumento
+# y si este exito imprime el nombre del archivo
+if [ "$1" = "-" ]
+then
+	for i in *
+	do
+		grep "$2" $i > /dev/null || echo $i
+	done
+else
+	for i in *
+	do
+	grep "$1" $i > /dev/null && echo $i
+	done
+fi

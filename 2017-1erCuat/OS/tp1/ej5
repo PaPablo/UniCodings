@@ -1,0 +1,9 @@
+#!/bin/bash
+entrada=0
+read entrada
+
+case $entrada in 
+	[0-9]) echo "dígito";;
+	[A-Za-z]) echo "letra";;
+	*) echo "otra cosa";;
+esac

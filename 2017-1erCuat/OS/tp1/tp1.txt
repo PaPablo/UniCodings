@@ -1,0 +1,13 @@
+Sistemas Operativos 2017 - Pablo Toledo
+
+Trabajo Práctico 1 
+
+COMANDOS DE LINUX
+
+1.
+a.
+	man: abre el manual en linea del cman exit
+	mando escrito a continuación de man.
+	exit: causa la finalización normal del proceso en el que se ejecute
+	passwd: cambia la contraseña del usuario
+

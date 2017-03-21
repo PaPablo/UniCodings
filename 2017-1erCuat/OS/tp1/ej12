@@ -1,0 +1,20 @@
+#!/bin/bash
+# Ejercicio 12
+
+# Primer argumento es la ciudad
+ciudad=$1
+# Segundo el pais
+pais=$2
+
+# pido con un curl la ubicación usando la API de google con los parametros pasados, 
+# uso jq para que sólo me quede la location. Lo hago de esta manera para hacer un solo uso de red
+ubicacion=$(curl "https://maps.googleapis.com/maps/api/geocode/json?address=$1,+$2")     
+
+#reparseo para obtener latitud y longitud en variables distintas
+lat="Latitud: "$(echo "$ubicacion" | grep \"location\" -A 2 | grep \"lat\" | awk '{split($0,a,":"); print a[2]}' | awk '{split($0,a,","); print a[1]}') 
+lng="Longitud: "$(echo "$ubicacion" | grep \"location\" -A 2 | grep \"lng\" | awk '{split($0,a,":"); print a[2]}' | awk '{split($0,a,","); print a[1]}')
+
+echo "Ciudad: " $1
+echo "$lat"
+echo "$lng"
+

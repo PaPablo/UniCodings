@@ -1,0 +1,12 @@
+#!/bin/bash
+i=0
+if [ $# -ge 3 ] && [ $# -le 5 ]; then
+	while [ $i -lt $# ];  do
+	 	#imprimo el primer parametro
+		echo $1
+		#corro los parametros hacia la izquierda, decrementa $#
+		shift
+	done
+else
+	echo "NO";
+fi
