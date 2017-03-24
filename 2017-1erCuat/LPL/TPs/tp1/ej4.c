@@ -8,7 +8,7 @@ char *getline(char *s,int max){
 	
 	for(i=0 ; i<max ; i++ ){
 		c = getchar();
-		if ((c == '\n') || (c == '\0')){
+		if ((c == '\n') || (c == EOF)){
 			break;
 		}
 		s[i]=c;
