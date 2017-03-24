@@ -51,7 +51,6 @@ int search(char *cadena, char *buscar) {
 		while((buscar[j] != '\0') && (match)){
 			//asigno el primero
 			//si son iguales avanzo con ambos y sigo
-			printf("cadena[%d]:%c | buscar[%d]:%c\n", i, cadena[i], j, buscar[j]);
 			if(cadena[i] == buscar[j]){
 				i++;
 				j++;
