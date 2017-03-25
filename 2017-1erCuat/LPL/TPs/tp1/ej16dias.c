@@ -2,7 +2,6 @@
 #include <ctype.h>
 #include <math.h>
 
-#define MAX_NOMBRE_DIA 9
 #define MAX_ENTRADA 10
 int obtenerEntero();
 int mostrarDiaSemana(int entrada);
@@ -10,7 +9,6 @@ char *pedirLinea(char *s,int max);
 
 int main(int argc, char const *argv[])
 {
-	char dia[MAX_NOMBRE_DIA];
 	int entrada;
 	do {
 		//pido numero
