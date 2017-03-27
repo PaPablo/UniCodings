@@ -8,6 +8,8 @@ struct fecha {
 	int anio;
 };
 
+typedef struct fecha Fecha;
+
 /* cantDiasMes(mes,año), esBisiesto(año) y esFechaValida(fecha) */
 
 
@@ -17,6 +19,10 @@ int esFechaValida(struct fecha f);
 
 int main(int argc, char const *argv[]) {
 
+	Fecha f2;
+	f2.dia = 29;
+	f2.mes = 2;
+	f2.anio = 2016;
 
 	struct fecha f1;
 	f1.dia = 29;
@@ -25,6 +31,8 @@ int main(int argc, char const *argv[]) {
 
 	printf("%d es bisiesto: %s\nEl mes %d tiene %d dias\nY %d/%d/%d %ses una fecha valida\n",
 		f1.anio, esBisiesto(f1.anio)?"si":"no",f1.mes, cantDiasMes(f1.mes,f1.anio),f1.dia,f1.mes,f1.anio,esFechaValida(f1)?"":"no ");
+	printf("%d es bisiesto: %s\nEl mes %d tiene %d dias\nY %d/%d/%d %ses una fecha valida\n",
+		f2.anio, esBisiesto(f2.anio)?"si":"no",f2.mes, cantDiasMes(f2.mes,f2.anio),f2.dia,f2.mes,f2.anio,esFechaValida(f2)?"":"no ");
 	return 0;
 }
 
