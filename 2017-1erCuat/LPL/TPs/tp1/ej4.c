@@ -2,26 +2,25 @@
 
 #define MAX 30
 //
-char *getline(char *s,int max){
+int nueva_linea(char *s,int max){
 	int i;
 	char c;
 	
-	for(i=0 ; i<max ; i++ ){
-		c = getchar();
-		if ((c == '\n') || (c == EOF)){
-			break;
-		}
-		s[i]=c;
+	while(((c = getchar())!=EOF) || (c != '\n')){
+		s[i++] = c;
 	}
-	return s;
+	s[i] = '\0';
+
+	return i;
 }
 
 int main(int argc, char *argv[]){
 	
 	char cadena[MAX];
-	getline(cadena, MAX);
+	nueva_linea(cadena, MAX);
 	int i;
-	for(i = 0; i < MAX; i++){
+	for(i = 0; cadena[i] !='\0'; i++){
 		printf("%c",cadena[i]);
 	}
+	printf("\n");
 }

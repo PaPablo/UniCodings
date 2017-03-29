@@ -2,9 +2,9 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define MAX_PALABRAS_RESERVADAS 11
+#define MAX_PALABRAS_RESERVADAS 12
 
-char *palabras_reservadas[MAX_PALABRAS_RESERVADAS] = {"break","case","default","do","else","for","if","return","switch","void","while"};
+char *palabras_reservadas[] = {"#include","break","case","default","do","else","for","if","return","switch","void","while"};
 
 int inicializar_arreglo(int *arreglo, int tope){
 	for(int i = 0; i < tope;i++){
