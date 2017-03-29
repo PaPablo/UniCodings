@@ -32,7 +32,12 @@ int main(int argc, char const *argv[])
  	char delim1[] = " ";
 	char pipe[] = "|";
 
-
+	/*	
+	*	Acá guardamos todos los comandos
+	*	en la fila i guadamos el i-ésimo
+	*	comando, y en sucesivas columnas
+	*	los argumentos de éste
+	*/
  	comando cmds[MAX_PIPES];
 
  	char *partes[MAX_PIPES];
@@ -42,6 +47,11 @@ int main(int argc, char const *argv[])
  	int i = 0;
  	parte = strtok(linea,pipe);
 
+ 	/*
+ 	*	Consigo los pedazos entre los pipes
+ 	*	Si pongo 'ls | grep cosas'
+ 	*	me devuelve "ls" y "grep cosas"
+ 	*/
  	while(parte != NULL){
 	 	//comienzo tokenización
 	 	partes[i] = malloc(strlen(parte)+1);
@@ -51,6 +61,13 @@ int main(int argc, char const *argv[])
  	}
  	partes[i] = NULL;
  	int cantidad_comandos = i-1;
+
+ 	/*
+ 	*	Ya con los comandos separados
+ 	*	armo el vector de argumentos que 
+ 	*	que luego le paso al exec para que 
+ 	*	ejecute
+ 	*/
  	for (int i = 0; partes[i] != NULL; i++){
  		int j = 0; 
 		char *palabra = strtok(partes[i],delim1);
@@ -68,6 +85,7 @@ int main(int argc, char const *argv[])
  	}
 
 
+ 	//solo lo muestra, para ver si anduvo todo bien
  	i = 0;
  	int j= 0; 
  	while((cmds[i][j] != NULL) && (i <= cantidad_comandos)){
