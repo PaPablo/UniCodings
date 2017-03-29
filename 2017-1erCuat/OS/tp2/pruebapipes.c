@@ -85,16 +85,16 @@ int main(int argc, char const *argv[])
  	}
 
 
- 	//solo lo muestra, para ver si anduvo todo bien
+ 	//solo lo muestra, para ver si anduvo todo bienu
  	i = 0;
  	int j= 0; 
  	while((cmds[i][j] != NULL) && (i <= cantidad_comandos)){
  		while(cmds[i][j] != NULL){
- 			printf("%s\n", cmds[i][j]);
+ 			printf("%s ", cmds[i][j]);
  			j++;
  		}
  		j=0;
- 		printf("%d\n", i);
+ 		printf("\n");
  		i++;
  	}
  	
