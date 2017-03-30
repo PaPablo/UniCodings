@@ -7,11 +7,16 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MAX_ARGUMENTOS 10
-#define MAX_LINEA 100
 
-int nueva_linea(char *linea,int tope);
+#define MAX_ARGUMENTOS 10
+#define MAX_PIPES 10
+#define MAX_LINEA 100
+#define MAX_CONDS 10
+
 int print_prompt();
+
+typedef char *pipeds[MAX_ARGUMENTOS];
+typedef pipeds comando[MAX_PIPES]; 
 
 int main(int argc, char const *argv[])
 {
@@ -20,61 +25,113 @@ int main(int argc, char const *argv[])
 		char linea[MAX_LINEA];
 		pid_t child_pid;
 		int status;
-
+		int no_termino_bien; //0 si termino bien, distinto de 0 si no
 		
 		//pido input desde la entrada estandar
-	 	print_prompt();
-	 	
-	 	scanf("%[^\n]",linea);
-	 	getchar();
+
+		do{
+			linea[0] = '\0';
+			print_prompt();
+		  	scanf("%[^\n]",linea);
+			getchar();
+		} while(strlen(linea)==0);
+
 		//delimitador para separar comandos
 	 	char delim1[] = " ";
-	 	char *comando[MAX_ARGUMENTOS];
-	 	//palabras spliteadas
-	 	char *palabra;
+		char pipe[] = "|";
+		char ampers[] = "&&";
+		int cantidad_condicionados;
+		int cantidad_comandos[MAX_CONDS];
 
-	 	//comienzo tokenización
-	 	palabra = strtok(linea,delim1);
-	 	int i = 0; 
-	 	while(palabra != NULL){
-	 		comando[i] = malloc(strlen(palabra) + 1);
+		/*	
+		*	Acá guardamos todos los comandos
+		*	en la fila i guadamos el i-ésimo
+		*	comando, y en sucesivas columnas
+		*	los argumentos de éste
+		*/
 
-	 		strcpy(comando[i],palabra);
-	 		i++;
-	 		palabra = strtok(NULL,delim1);
+	 	comando cmds[MAX_CONDS];
+	 	
+	 	/*
+	 	*	Conseguir los pedazos entre los &&
+	 	* 	Cada elemento del arreglo es lo que se encuentra entr &&
+	 	*/
+		int k = 0;
+		char *condicionados[MAX_CONDS];
+		char *cond;
+		cond = strtok(linea,ampers);
+		while(cond != NULL){
+			condicionados[k] = malloc(strlen(cond)+1);
+			strcpy(condicionados[k],cond);
+			k++;
+			cond = strtok(NULL,ampers);
+		}
+		condicionados[k] = malloc(sizeof(NULL));
+		condicionados[k] = NULL;
+		int cant_condicionados = k;
+
+	 	/*
+	 	*	Me genera una matriz en la que el elemento k,i es 
+	 	*	el i-esimo comando del pipe en el k-esimo comando 
+	 	*	condicional
+	 	*	Consigo los pedazos entre los 
+	 	*	Si pongo 'ls | grep cosas'
+	 	*	me devuelve "ls" y "grep cosas"
+	 	*/
+	 	char *partes[MAX_CONDS][MAX_PIPES];
+	 	char *parte;
+	 	for (k = 0; condicionados[k] != NULL;k++){
+		 	int i = 0;
+		 	parte = strtok(condicionados[k],pipe);
+		 	while(parte != NULL){
+			 	//comienzo tokenización
+			 	partes[k][i] = malloc(strlen(parte)+1);
+			 	strcpy(partes[k][i],parte);
+		 		i++;		
+		 		parte = strtok(NULL,pipe);
+		 	}
+		 	partes[k][i] = malloc(sizeof(NULL));
+		 	partes[k][i] = NULL;
+		 	cantidad_comandos[k] = i;
 	 	}
-	 	comando[i] = NULL;
-	 	
-	 	//cerré mi arreglo de argumentos
-	 	
+
+	 	/*	
+	 	*	Ya con los comandos separados
+	 	*	armo el vector de argumentos que 
+	 	*	que luego le paso al exec para que 
+	 	*	ejecute
+	 	*	Cubo donde el elemento k,i,j es 
+	 	*	el j-esimo comando del i-esimo elemento 
+	 	*	del pipe del k-esimo comando condicional
+	 	*/
+	 	for(int k = 0, i = 0; partes[k][i] != NULL; k++){
+	 		while(i < cantidad_comandos[k]){
+		 		int j = 0;
+		 		char *argumento = strtok(partes[k][i],delim1);
+		 		while(argumento != NULL){
+		 			cmds[k][i][j] = malloc(strlen(argumento)+1);
+		 			strcpy(cmds[k][i][j],argumento);
+		 			j++;
+		 			argumento = strtok(NULL,delim1);
+		 		}
+		 		cmds[k][i][j] = malloc(sizeof(NULL));
+		 		cmds[k][i][j] = NULL;
+		 		i++;
+	 		}
+	 		i=0;
+	 	}
 		if(child_pid = fork()){
 			//proceso padre
 			waitpid(child_pid,&status, 0);
-			
+			no_termino_bien = WIFEXITED(status)?WEXITSTATUS(status):0;	
 		}
 		else {
-			//proceso hijo
-			execv(comando[0],comando);
+			execv(cmds[0][0][0],&cmds[0][0][0]);
 		}
-
-
+		fflush(stdin);
 	}	
 
 	return 0;
-}
-
-int nueva_linea(char *linea,int tope){
-	int i = 0; 
-	char c;
-	do{
-		c = getchar();
-		if((c == '\n') || (c == EOF))
-			break;
-		linea[i] = c;
-		i++;
-	} while(i < tope);
-	linea[i] = '\0';
-	return i-1;
 }
 
 int print_prompt(){
