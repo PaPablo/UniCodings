@@ -126,7 +126,7 @@ int main(int argc, char const *argv[])
 			no_termino_bien = WIFEXITED(status)?WEXITSTATUS(status):0;	
 		}
 		else {
-			execv(cmds[0][0][0],&cmds[0][0][0]);
+			//ver como hacemos los pipes
 		}
 		fflush(stdin);
 	}	
