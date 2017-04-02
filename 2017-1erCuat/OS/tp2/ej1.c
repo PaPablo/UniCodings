@@ -17,6 +17,8 @@ int print_prompt();
 
 typedef char *pipeds[MAX_ARGUMENTOS];
 typedef pipeds comando[MAX_PIPES]; 
+int inicializar_entrada(comando cmds);
+
 
 int main(int argc, char const *argv[])
 {
@@ -40,7 +42,7 @@ int main(int argc, char const *argv[])
 	 	char delim1[] = " ";
 		char pipe[] = "|";
 		char ampers[] = "&&";
-		int cantidad_condicionados;
+		int cant_condicionados;
 		int cantidad_comandos[MAX_CONDS];
 
 		/*	
@@ -51,6 +53,7 @@ int main(int argc, char const *argv[])
 		*/
 
 	 	comando cmds[MAX_CONDS];
+
 	 	
 	 	/*
 	 	*	Conseguir los pedazos entre los &&
@@ -68,7 +71,7 @@ int main(int argc, char const *argv[])
 		}
 		condicionados[k] = malloc(sizeof(NULL));
 		condicionados[k] = NULL;
-		int cant_condicionados = k;
+		cant_condicionados = k;
 
 	 	/*
 	 	*	Me genera una matriz en la que el elemento k,i es 
@@ -123,12 +126,38 @@ int main(int argc, char const *argv[])
 		if(child_pid = fork()){
 			//proceso padre
 			waitpid(child_pid,&status, 0);
-			no_termino_bien = WIFEXITED(status)?WEXITSTATUS(status):0;	
 		}
 		else {
-			//ver como hacemos los pipes
+			// maxima cantidad de condicionados 1
+			// max pipes por condicionado 1
+			if(cant_condicionados > 1){
+				int cond_pid, cond_status;
+				int cond_no_termino_bien;
+				if(cond_pid = fork()){
+					//proceso padre
+					waitpid(cond_pid,&cond_status,0);
+					cond_no_termino_bien = WIFEXITED(cond_status)?WEXITSTATUS(cond_status):0;
+					if(!cond_no_termino_bien){
+						execv(cmds[1][0][0],&cmds[1][0][0]);
+					}					
+				}
+				else {
+					//proceso hijo
+					execv(cmds[0][0][0],&cmds[0][0][0]);
+				}
+			}
+			else {
+				execv(cmds[0][0][0],&cmds[0][0][0]);
+			}
 		}
 		fflush(stdin);
+		/*for(int i = 0; i < cant_condicionados; i++){
+			for(int j = 0; j < cantidad_comandos[i]; j++){
+				cantidad_comandos[i]= 0;
+			}
+		}
+		cant_condicionados = 0;*/
+
 	}	
 
 	return 0;
@@ -137,5 +166,6 @@ int main(int argc, char const *argv[])
 int print_prompt(){
 	printf("Milonga$ ");
 }
+
 
 
