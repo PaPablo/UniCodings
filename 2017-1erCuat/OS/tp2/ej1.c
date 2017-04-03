@@ -18,10 +18,10 @@ int print_prompt();
 typedef char *pipeds[MAX_ARGUMENTOS];
 typedef pipeds comando[MAX_PIPES]; 
 int inicializar_entrada(comando cmds);
+int comandos_condicionales(char *comando1[], char *comando2[]);
+int exec_pipes(char *comando1[],char *comando2[]);
 
-
-int main(int argc, char const *argv[])
-{
+int main(int argc, char const *argv[]){
 	while(1){
 
 		char linea[MAX_LINEA];
@@ -40,7 +40,7 @@ int main(int argc, char const *argv[])
 
 		//delimitador para separar comandos
 	 	char delim1[] = " ";
-		char pipe[] = "|";
+		char pipes[] = "|";
 		char ampers[] = "&&";
 		int cant_condicionados;
 		int cantidad_comandos[MAX_CONDS];
@@ -85,13 +85,13 @@ int main(int argc, char const *argv[])
 	 	char *parte;
 	 	for (k = 0; condicionados[k] != NULL;k++){
 		 	int i = 0;
-		 	parte = strtok(condicionados[k],pipe);
+		 	parte = strtok(condicionados[k],pipes);
 		 	while(parte != NULL){
 			 	//comienzo tokenización
 			 	partes[k][i] = malloc(strlen(parte)+1);
 			 	strcpy(partes[k][i],parte);
 		 		i++;		
-		 		parte = strtok(NULL,pipe);
+		 		parte = strtok(NULL,pipes);
 		 	}
 		 	partes[k][i] = malloc(sizeof(NULL));
 		 	partes[k][i] = NULL;
@@ -123,6 +123,9 @@ int main(int argc, char const *argv[])
 	 		}
 	 		i=0;
 	 	}
+
+
+	 	//EJECUCION
 		if(child_pid = fork()){
 			//proceso padre
 			waitpid(child_pid,&status, 0);
@@ -131,23 +134,38 @@ int main(int argc, char const *argv[])
 			// maxima cantidad de condicionados 1
 			// max pipes por condicionado 1
 			if(cant_condicionados > 1){
-				int cond_pid, cond_status;
-				int cond_no_termino_bien;
-				if(cond_pid = fork()){
+
+				int cond_child_pid, cond_child_status;
+				int cond_child_end_badly;
+				if(cond_child_pid = fork()){
 					//proceso padre
-					waitpid(cond_pid,&cond_status,0);
-					cond_no_termino_bien = WIFEXITED(cond_status)?WEXITSTATUS(cond_status):0;
-					if(!cond_no_termino_bien){
-						execv(cmds[1][0][0],&cmds[1][0][0]);
-					}					
+					waitpid(cond_child_pid,&cond_child_status,0);
+					cond_child_end_badly = WIFEXITED(cond_child_status)?WEXITSTATUS(cond_child_status):0;
+					if(!cond_child_end_badly){
+							if(cantidad_comandos[1]-1){
+								exec_pipes(&cmds[1][0][0],&cmds[1][1][0]);
+							}
+							else {
+								execv(cmds[1][0][0],&cmds[1][0][0]);
+							}
+					}		
 				}
 				else {
-					//proceso hijo
-					execv(cmds[0][0][0],&cmds[0][0][0]);
+					if(cantidad_comandos[0]-1){
+						exec_pipes(&cmds[0][0][0],&cmds[0][1][0]);
+					}
+					else{
+						execv(cmds[0][0][0],&cmds[0][0][0]);
+					}
 				}
 			}
 			else {
-				execv(cmds[0][0][0],&cmds[0][0][0]);
+				if(cantidad_comandos[0]-1){
+					exec_pipes(&cmds[0][0][0],&cmds[0][1][0]);
+				}
+				else{
+					execv(cmds[0][0][0],&cmds[0][0][0]);
+				}
 			}
 		}
 		fflush(stdin);
@@ -158,7 +176,8 @@ int main(int argc, char const *argv[])
 		}
 		cant_condicionados = 0;*/
 
-	}	
+	}
+
 
 	return 0;
 }
@@ -167,5 +186,50 @@ int print_prompt(){
 	printf("Milonga$ ");
 }
 
+
+int comandos_condicionales(char *comando1[], char *comando2[]){
+	int child_pid, child_status;
+	int child_end_badly;
+	if(child_pid = fork()){
+		//proceso padre
+		waitpid(child_pid,&child_status,0);
+		child_end_badly = WIFEXITED(child_status)?WEXITSTATUS(child_status):0;
+		if(!child_end_badly){
+				execv(comando2[0],&comando2[0]);
+		}		
+	}
+	else {
+		//proceso hijo
+		execv(comando1[0],&comando1[0]);
+	}
+
+	return 0;
+}
+
+int exec_pipes(char *comando1[],char *comando2[]){
+	int tuberia[2];
+	pipe(&tuberia[0]);
+
+	if(fork()){
+		close(tuberia[1]);
+		close(0);//cierro mi entrada estandar
+		dup(tuberia[0]); // conecto la salida de la tuberia con mi entrada estandar
+
+		close(tuberia[0]); //cierro porque puedo
+
+		execv(comando2[0],&comando2[0]);	
+	}
+	else {
+		close(tuberia[0]);
+		close(1); //cierro salida estandar del padre
+
+		dup(tuberia[1]); //conecto salida del proceso con entrada de la tuberia
+
+		close(tuberia[1]); //cierro porque puedo
+		
+		execv(comando1[0],&comando1[0]);
+	}
+	return 0;
+}
 
 
